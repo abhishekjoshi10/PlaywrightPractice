@@ -1,74 +1,60 @@
- const {test, expect} = require('@playwright/test');
- const {POManager} = require('../pageobjects/POManager');
- const dataset =JSON.parse(JSON.stringify(require('../utils/placeOrderTestData.json')));
+const { test, expect } = require('@playwright/test');
+const { customtest } = require('../utils/test-base');
+const { POManager } = require('../pageobjects/POManager');
+// Simply import the JSON array directly
+const datasets = require('../utils/placeOrderTestData.json');
 
- test('Client App login', async ({page})=>
- {
-   const poManager = new POManager(page);
-    //js file- Login js, DashboardPage
-  
-     const products = page.locator(".card-body");
-     const loginPage = poManager.getLoginPage();
-     await loginPage.goTo();
-     await loginPage.ValidLogin(dataset.username,dataset.password);
-     const dashboardPage = poManager.getDashboardPage();
-     await dashboardPage.searchProductAddCart(dataset.productName);
-     await dashboardPage.navigateToCart();
+// Loop through each dataset to generate independent test runs automatically
+for (const data of datasets) {
+  test(`Client App login for product: ${data.productName}`, async ({ page }) => {
+    const poManager = new POManager(page);
+    
+    const loginPage = poManager.getLoginPage();
+    await loginPage.goTo();
+    await loginPage.ValidLogin(data.username, data.password);
+
+    const dashboardPage = poManager.getDashboardPage();
+    await dashboardPage.searchProductAddCart(data.productName);
+    await dashboardPage.navigateToCart();
 
     const cartPage = poManager.getCartPage();
-    await cartPage.VerifyProductIsDisplayed(dataset.productName);
+    await cartPage.VerifyProductIsDisplayed(data.productName);
     await cartPage.Checkout();
 
     const ordersReviewPage = poManager.getOrdersReviewPage();
-    await ordersReviewPage.searchCountryAndSelect("ind","India");
+    await ordersReviewPage.searchCountryAndSelect("ind", "India");
     const orderId = await ordersReviewPage.SubmitAndGetOrderId();
-   console.log(orderId);
-   await dashboardPage.navigateToOrders();
-   const ordersHistoryPage = poManager.getOrdersHistoryPage();
-   await ordersHistoryPage.searchOrderAndSelect(orderId);
-   expect(orderId.includes(await ordersHistoryPage.getOrderId())).toBeTruthy();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
     
-
-
-    //Zara Coat 4
-
-
-
-
-
+    await dashboardPage.navigateToOrders();
+    const ordersHistoryPage = poManager.getOrdersHistoryPage();
+    await ordersHistoryPage.searchOrderAndSelect(orderId);
     
+    expect(orderId.includes(await ordersHistoryPage.getOrderId())).toBeTruthy();
+  });
+}
 
+ customtest(`Client App login for product:`, async ({ page,testDataForOrder }) => {
+    const poManager = new POManager(page);
+    
+    const loginPage = poManager.getLoginPage();
+    await loginPage.goTo();
+    await loginPage.ValidLogin(testDataForOrder.username, testDataForOrder.password);
 
+    const dashboardPage = poManager.getDashboardPage();
+    await dashboardPage.searchProductAddCart(testDataForOrder.productName);
+    await dashboardPage.navigateToCart();
 
+    const cartPage = poManager.getCartPage();
+    await cartPage.VerifyProductIsDisplayed(testDataForOrder.productName);
+    await cartPage.Checkout();
 
-
-
-
-
-
- });
- 
-
- 
-
-
-
- 
-
+    const ordersReviewPage = poManager.getOrdersReviewPage();
+    await ordersReviewPage.searchCountryAndSelect("ind", "India");
+    const orderId = await ordersReviewPage.SubmitAndGetOrderId();
+    
+    await dashboardPage.navigateToOrders();
+    const ordersHistoryPage = poManager.getOrdersHistoryPage();
+    await ordersHistoryPage.searchOrderAndSelect(orderId);
+    
+    expect(orderId.includes(await ordersHistoryPage.getOrderId())).toBeTruthy();
+  });

@@ -1,5 +1,12 @@
-{
-    "username": "anshika@gmail.com",
-    "password": "Iamking@000",
-    "productName": "ZARA COAT 3"
-}
+[
+    {
+        "username": "anshika@gmail.com",
+        "password": "Iamking@000",
+        "productName": "ZARA COAT 3"
+    },
+    {
+        "username": "test1installer1@arthtechltd.com",
+        "password": "Pass@123",
+        "productName": "iphone 13 pro"
+    }
+]
