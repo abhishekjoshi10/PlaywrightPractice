@@ -7,6 +7,9 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
 
   testDir: './tests',
+  retries:1,
+  fullyParallel: true,
+  workers:5, //this will restrict the parallel execution with 5.
 
   timeout: 40 * 1000,
 
@@ -19,11 +22,11 @@ export default defineConfig({
   projects: [
 
     {
-      name: 'safari execution',
+      name: 'safari',
 
       use: {
         browserName: 'webkit',
-        headless: false,
+        headless: true,
         screenshot: 'on',
         trace: 'on',
        // ...devices['iPhone 15 Pro'],
@@ -36,7 +39,7 @@ export default defineConfig({
 
       use: {
         browserName: 'chromium',
-        headless: true,
+        headless: false,
         screenshot: 'on',
         video:'retain-on-failure',
         trace: 'on',

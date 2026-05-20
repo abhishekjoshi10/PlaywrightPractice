@@ -1,0 +1,10 @@
+"use strict";
+let messaage1 = 'hello ts';
+let age1 = 20;
+let number1 = [1, 2, 3];
+let data = "This could be anything";
+data = 42;
+console.log(messaage1);
+console.log(age1);
+console.log(number1);
+console.log(data);

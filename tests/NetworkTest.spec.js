@@ -3,7 +3,7 @@ const {test,expect,request} = require('@playwright/test');
 
 const LoginPayLoad ={userEmail: "test1installer1@arthtechltd.com", userPassword: "Pass@123"};
 const OrderPayLoad={orders: [{country: "India", productOrderedId: "6960eac0c941646b7a8b3e68"}]};
-const{APIutils}=require('./utils/APIutils');
+const{APIutils}=require('../utils/APIutils');
 const fakePayLoadOrders={data:[],message:"No Orders"};
 
 

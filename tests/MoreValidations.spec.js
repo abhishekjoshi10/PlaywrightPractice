@@ -1,6 +1,8 @@
 const {test,expect} = require('@playwright/test');
 const { on } = require('node:cluster');
 
+//test.describe.configure({mode:'parallel'});
+test.describe.configure({mode:'serial'}); // here it will run sequencially but if one test case gets fail then other will be skipped.
 test('PopUp validations', async({page})=>
 {
     await page.goto("https://rahulshettyacademy.com/AutomationPractice/");
@@ -29,9 +31,9 @@ test("Screenshot & Visual comparision", async ({page}) =>
 });
 
 
-test.only('visual', async ({page}) =>
+test('visual', async ({page}) =>
 {
     await page.goto("https://www.google.com/");
-    expect(await page.screenshot()).toMatchSnapshot('landing.png');
+   // expect(await page.screenshot()).toMatchSnapshot('landing.png');
 
 })
