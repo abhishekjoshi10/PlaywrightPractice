@@ -1,34 +1,57 @@
 const { Given, When, Then } = require('@cucumber/cucumber');
+const { POManager } = require('../../pageobjects/POManager');
+const { expect } = require('@playwright/test');
+// FIX 1: Import chromium directly from the package instead of 'playwright'
+const { chromium } = require('@playwright/test'); 
 
-Given('a login to Ecommerce application with {username} and {password}', async function (username, password) {
-    // Write code here that turns the phrase above into concrete actions
-    return 'pending';
+Given('a login to Ecommerce application with {string} and {string}',  {timeout: 100 * 1000},async function (username, password) {
+
+    const browser = await chromium.launch({ headless: false }); 
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    this.browser = browser; 
+    this.poManager = new POManager(page);
+    
+    const loginPage = this.poManager.getLoginPage();
+    await loginPage.goTo();
+    await loginPage.ValidLogin(username, password);
 });
 
-// 2. When step to add an item to the cart
-When('Add {string} to cart', async function (productName) {
-    // Your code to search and add the product goes here
-    console.log(`Adding product to cart: ${productName}`);
-     return 'pending';
+When('Add {string} to cart', {timeout: 100 * 1000}, async function (productName) {
+    this.dashboardPage = this.poManager.getDashboardPage();
+    await this.dashboardPage.searchProductAddCart(productName);
+    await this.dashboardPage.navigateToCart();
 });
 
 // 3. Then step to verify the product in the cart
-Then('Verify {string} is displayed in the Cart', async function (productName) {
-    // Your assertion code goes here
-    console.log(`Verifying product in cart: ${productName}`);
-     return 'pending';
+Then('Verify {string} is displayed in the Cart', {timeout: 100 * 1000}, async function (productName) {
+    const cartPage = this.poManager.getCartPage();
+    await cartPage.VerifyProductIsDisplayed(productName);
+    await cartPage.Checkout();
 });
 
 // 4. When step for entering details and placing order
-When('Enter valid details and Place the Order', async function () {
-    // Your checkout flow code goes here
-    console.log('Placing the order...');
-     return 'pending';
+When('Enter valid details and Place the Order', {timeout: 100 * 1000}, async function () {
+    const ordersReviewPage = this.poManager.getOrdersReviewPage();
+    await ordersReviewPage.searchCountryAndSelect("ind", "India");
+    
+    // Save orderId to 'this' context so the next step can read it
+    this.orderId = await ordersReviewPage.SubmitAndGetOrderId();
+    console.log('Placing the order... ID: ' + this.orderId);
 });
 
 // 5. Then step for order history validation
-Then('Verfify order in present in the OrderHistory', async function () {
-    // Your validation code goes here
-    console.log('Checking order history...');
-     return 'pending';
+Then('Verify order in present in the OrderHistory', {timeout: 100 * 1000}, async function () {
+    await this.dashboardPage.navigateToOrders();
+    const ordersHistoryPage = this.poManager.getOrdersHistoryPage();
+    
+    // Read orderId from context
+    await ordersHistoryPage.searchOrderAndSelect(this.orderId);
+    
+    const historyId = await ordersHistoryPage.getOrderId();
+    expect(this.orderId.includes(historyId)).toBeTruthy();
+    console.log('Checking order history completed successfully.');
+    
+    // Clean closure: Close browser at the end of the scenario
+    await this.browser.close();
 });
